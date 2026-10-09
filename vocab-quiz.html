@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="德语背单词练习 · Nicos Weg 词表">
+  <title>背单词 · 电子学习练习册</title>
+  <link rel="stylesheet" href="styles.css?v=20261004-wordbook3">
+  <link rel="stylesheet" href="vocab-quiz.css?v=20261004-wordbook3">
+  <script defer src="data/vocab-quiz.js?v=20260930-vocabquiz1"></script>
+  <script defer src="vocab-quiz.js?v=20261004-wordbook3"></script>
+
+  <!-- web-to-github-pwa: PWA 注入片段 -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#4f46e5">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="背单词">
+  <script defer src="install-banner.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('service-worker.js').catch(function (e) {
+          console.warn('[PWA] SW 注册失败：', e);
+        });
+      });
+    }
+  </script>
+</head>
+<body>
+  <div class="vq-shell">
+    <header class="vq-topbar">
+      <a class="brand" href="index.html">
+        <span class="brand-mark">GA</span>
+        <span><strong>背单词</strong><small>Nicos Weg 词表练习</small></span>
+      </a>
+      <nav class="vq-nav" aria-label="全局导航">
+        <button type="button" class="text-button quiet" id="vq-wordbook-open">错词本</button>
+        <a class="text-button quiet" href="review.html">综合复习</a>
+        <a class="text-button quiet" href="index.html">返回课程</a>
+      </nav>
+    </header>
+
+    <div class="vq-layout">
+    <aside class="vq-history" aria-label="练习历史">
+      <div class="vq-history-head">
+        <h2>练习历史</h2>
+        <button type="button" class="text-button quiet" id="vq-new">＋ 新练习</button>
+      </div>
+      <div id="vq-history-list" class="vq-history-list"></div>
+    </aside>
+
+    <main class="vq-main">
+      <!-- 设置面板 -->
+      <section id="vq-setup" class="vq-panel">
+        <div class="vq-setup-head">
+          <p class="eyebrow">VOCAB TRAINER</p>
+          <h1>选择练习范围与题型</h1>
+        </div>
+
+        <fieldset class="vq-field">
+          <legend>课程范围</legend>
+          <div class="vq-lesson-tools">
+            <button type="button" class="text-button quiet" id="vq-lesson-all">全选</button>
+            <button type="button" class="text-button quiet" id="vq-lesson-none">全不选</button>
+          </div>
+          <div id="vq-lessons" class="vq-lessons"></div>
+        </fieldset>
+
+        <fieldset class="vq-field">
+          <legend>词性</legend>
+          <div id="vq-pos" class="vq-checks"></div>
+        </fieldset>
+
+        <fieldset class="vq-field">
+          <legend>题型</legend>
+          <div id="vq-types" class="vq-checks"></div>
+        </fieldset>
+
+        <div class="vq-field vq-field-row">
+          <label for="vq-count">题量</label>
+          <select id="vq-count">
+            <option value="10">10 题</option>
+            <option value="20" selected>20 题</option>
+            <option value="30">30 题</option>
+            <option value="50">50 题</option>
+            <option value="0">全部（各一遍）</option>
+            <option value="-1">无限循环</option>
+          </select>
+        </div>
+
+        <p id="vq-avail" class="vq-avail"></p>
+        <button id="vq-start" type="button" class="vq-primary">开始练习</button>
+      </section>
+
+      <!-- 答题区 -->
+      <section id="vq-quiz" class="vq-panel" hidden>
+        <div class="vq-quiz-head">
+          <span id="vq-progress" class="vq-progress">0 / 0</span>
+          <span id="vq-score" class="vq-score">正确 0</span>
+          <button id="vq-quit" type="button" class="text-button quiet">结束</button>
+        </div>
+        <div id="vq-stage" class="vq-stage"></div>
+      </section>
+
+      <!-- 结算 -->
+      <section id="vq-result" class="vq-panel" hidden>
+        <div class="vq-setup-head">
+          <p class="eyebrow">RESULT</p>
+          <h1 id="vq-result-title">练习完成</h1>
+        </div>
+        <dl class="vq-result-stats">
+          <div><dt>题数</dt><dd id="vq-r-total">0</dd></div>
+          <div><dt>正确</dt><dd id="vq-r-correct">0</dd></div>
+          <div><dt>正确率</dt><dd id="vq-r-rate">0%</dd></div>
+        </dl>
+        <div id="vq-wrong-list" class="vq-wrong-list"></div>
+        <div class="vq-result-actions">
+          <button id="vq-retry-wrong" type="button" class="vq-primary" hidden>只练错题</button>
+          <button id="vq-again" type="button" class="text-button">再来一组</button>
+        </div>
+      </section>
+
+      <!-- 历史详情（只看）-->
+      <section id="vq-detail" class="vq-panel" hidden>
+        <div class="vq-detail-head">
+          <div>
+            <p class="eyebrow">HISTORY</p>
+            <h1 id="vq-detail-title">练习记录</h1>
+            <p id="vq-detail-scope" class="vq-detail-scope"></p>
+          </div>
+          <button id="vq-detail-close" type="button" class="text-button quiet">关闭</button>
+        </div>
+        <dl class="vq-result-stats">
+          <div><dt>题数</dt><dd id="vq-d-total">0</dd></div>
+          <div><dt>正确</dt><dd id="vq-d-correct">0</dd></div>
+          <div><dt>正确率</dt><dd id="vq-d-rate">0%</dd></div>
+        </dl>
+        <div id="vq-detail-wrong" class="vq-wrong-list"></div>
+      </section>
+
+      <!-- 错词本 -->
+      <section id="vq-wordbook" class="vq-panel" hidden>
+        <div class="vq-detail-head">
+          <div>
+            <p class="eyebrow">WORDBOOK</p>
+            <h1>错词本</h1>
+            <p id="vq-wordbook-sub" class="vq-detail-scope"></p>
+          </div>
+          <button id="vq-wordbook-close" type="button" class="text-button quiet">关闭</button>
+        </div>
+        <div id="vq-wordbook-filter" class="vq-wordbook-filter">
+          <button type="button" data-mode="unmastered" class="is-active">未掌握</button>
+          <button type="button" data-mode="all">全部错过</button>
+        </div>
+        <div class="vq-wordbook-tools">
+          <button id="vq-wordbook-practice" type="button" class="vq-primary">练习这些词</button>
+          <button id="vq-wordbook-clear" type="button" class="text-button quiet">清空错词本</button>
+        </div>
+        <div id="vq-wordbook-list" class="vq-wordbook-list"></div>
+      </section>
+    </main>
+    </div>
+  </div>
+</body>
+</html>
