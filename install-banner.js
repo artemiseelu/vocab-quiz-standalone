@@ -106,5 +106,20 @@
         );
       }, 1500);
     });
+  } else {
+    // 兜底：非 iOS 且在一段时间内没触发 beforeinstallprompt
+    // （华为自带浏览器、部分国产浏览器内核不支持原生安装横幅），
+    // 显示手动添加提示，引导用户用浏览器菜单“添加到桌面/主屏幕”。
+    window.addEventListener('load', function () {
+      setTimeout(function () {
+        if (deferredPrompt) return; // 已能原生安装，不打扰
+        if (document.getElementById('pwa-install-banner')) return;
+        makeBanner(
+          '点击浏览器右上角「菜单」，选择「添加到桌面」或「添加到主屏幕」即可安装。' +
+          '（部分浏览器需在设置里开启）',
+          false
+        );
+      }, 2500);
+    });
   }
 })();
